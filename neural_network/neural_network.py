@@ -60,25 +60,27 @@ class SelectionTree(object):
         self._weight_matrix_3 += np.dot(A_3.T, D_43)
 
     def _train(self):
-        for i in range(1, self.N):
-            try:
-                data = Tutorials.get_sample(i)
-            except ValueError:
-                continue
-            input_train = np.array([data["inputs"]])
-            output_train = np.array([data["answer"]]).T
-            self._dostep(input_train, output_train)
+        for j in range(100):
+            for i in range(1, self.N):
+                try:
+                    data = Tutorials.get_sample(i)
+                except ValueError:
+                    continue
+                input_train = np.array([data["inputs"]])
+                output_train = np.array([data["answer"]]).T
+                self._dostep(input_train, output_train)
 
-            # print('step: '+str(i))
-            # print('WM_3 (3,1)')
-            # print(self._weight_matrix_3)
-            #
-            # print('WM_2 (5,3)')
-            # print(self._weight_matrix_2)
-            #
-            # print('WM_1 (9,5)')
-            # print(self._weight_matrix_1)
-            # print('\n')
+                # print('step: '+str(i))
+                # print('WM_3 (3,1)')
+                # print(self._weight_matrix_3)
+                #
+                # print('WM_2 (5,3)')
+                # print(self._weight_matrix_2)
+                #
+                # print('WM_1 (9,5)')
+                # print(self._weight_matrix_1)
+                # print('\n')
+            print('TRAINING COMPLETED! OMG!')
 
 
-BRW = SelectionTree(1)
+
