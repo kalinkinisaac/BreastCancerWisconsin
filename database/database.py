@@ -1,8 +1,9 @@
 import csv, sqlite3
 
+
 class Database(object):
-    def __init__(self, file_path="db2.db", name='WDBC'):
-        self._fields = None
+    def __init__(self, fields=None, file_path="db2.db", name='WDBC'):
+        self._fields = fields
         self.name = name
         self.conn = sqlite3.connect(file_path)
         self.curs = self.conn.cursor()
@@ -33,7 +34,8 @@ class Database(object):
         self.conn.commit()
 
     def get_row(self, id):
-        self.curs.execute("SELECT * FROM {} WHERE id=?".format(self.name), (id,))
+        self.curs.execute("SELECT {} FROM {} WHERE id=?".format(', '.join(list(self._fields.keys())[1:]), self.name),
+                          (id,))
         return self.curs.fetchall()
 
     def get_rows(self, id_min, id_max):
