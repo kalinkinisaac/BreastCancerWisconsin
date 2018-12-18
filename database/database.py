@@ -1,45 +1,61 @@
-import csv, sqlite3
+import os
+import csv
+import sqlite3
+
+CREATE_TABLE_STR = "CREATE TABLE {} (id INTEGER PRIMARY KEY, {});"
+LOAD_DATA_STR = "INSERT INTO {} ({}) VALUES ({});"
+SELECT_ROW_ID_STR = "SELECT {} FROM {} WHERE id=?"
+SELECT_ROW_ID_RANGE_STR = "SELECT {} FROM {} WHERE id>=? AND id <?"
+DROP_TABLE_STR = "DROP TABLE IF EXISTS {};"
+DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 class Database(object):
-    def __init__(self, fields=None, file_path="db2.db", name='WDBC'):
-        self._fields = fields
-        self.name = name
-        self.conn = sqlite3.connect(file_path)
+    def __init__(self, file_name, db_name, fields=None):
+        self.name = db_name
+        self.conn = sqlite3.connect(os.path.join(DIR_PATH, file_name))
         self.curs = self.conn.cursor()
+        self._columns = self.get_columns()
+
+        if fields:
+            self.create(fields)
+        else:
+            self._columns = self.get_columns()
 
     def create(self, fields):
-        self._fields = fields
-        self._create()
+        self._columns = fields
 
-    def _create(self):
-        if not self._fields:
-            raise Exception('Database have not been initialized')
+        self.curs.execute(DROP_TABLE_STR.format(self.name))
 
-        fields_str = ', '.join(["{} {}".format(x, y) for (x, y) in zip(self._fields.keys(), self._fields.values())])
-        self.curs.execute("CREATE TABLE {} (id INTEGER PRIMARY KEY, {});".format(self.name, fields_str))
+        columns_str = ', '.join([f"{field} TEXT" for field in self._columns])
+
+        self.curs.execute(CREATE_TABLE_STR.format(self.name, columns_str))
+
+    def get_columns(self):
+        self.curs.execute("PRAGMA table_info({});".format(self.name))
+        return list(map(lambda c: c[1], self.curs.fetchall()))[1:]
 
     def load_data(self, data_path):
-        if not self._fields:
-            raise Exception('Database have not been initialized')
+        if not self._columns:
+            raise Exception('Database has not been initialized')
 
         reader = csv.reader(open(data_path, 'r'), delimiter=',')
-        fields_str_1 = ', '.join(self._fields.keys())
-        fields_str_2 = ', '.join(['?'] * len(self._fields))
+        params = ', '.join(self._columns)
+        blanks = ', '.join(['?'] * len(self._columns))
 
         for row in reader:
-            to_db = list(map(str, row))
-            self.curs.execute("INSERT INTO {} ({}) VALUES ({});".format(DB_NAME, fields_str_1, fields_str_2), to_db)
+            row_str = list(map(str, row))
+            self.curs.execute(LOAD_DATA_STR.format(self.name, params, blanks), row_str)
 
         self.conn.commit()
 
-    def get_row(self, id):
-        self.curs.execute("SELECT {} FROM {} WHERE id=?".format(', '.join(list(self._fields.keys())[1:]), self.name),
-                          (id,))
+    def get_row(self, row_id, fields=None):
+        self.curs.execute(SELECT_ROW_ID_STR.format(', '.join(list(self._columns if not fields else fields)), self.name),
+                          (row_id,))
         return self.curs.fetchall()
 
-    def get_rows(self, id_min, id_max):
+    def get_rows(self, row_min_id, row_max_id, fields=None):
         self.curs.execute(
-            "SELECT {} FROM {} WHERE id>=? AND id <?".format(', '.join(list(self._fields.keys())[1:]), self.name),
-            (id_min, id_max,))
+            SELECT_ROW_ID_RANGE_STR.format(', '.join(list(self._columns if not fields else fields)), self.name),
+            (row_min_id, row_max_id,))
         return self.curs.fetchall()
