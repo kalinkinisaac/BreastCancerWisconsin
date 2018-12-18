@@ -18,7 +18,5 @@ fields = dict({
 })
 
 # This code will create database file in root directory of the project
-db.init(fields=fields)
-db.load_data("data.txt")
 
 
