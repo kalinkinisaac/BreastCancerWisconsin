@@ -1,13 +1,16 @@
 import numpy as np
 from .training_data import Tutorials
 
+
 # Sigmoid function
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
+
 # Derivative of sigmoid function
 def der_sigmoid(x):
     return x * (1 - x)
+
 
 np.random.seed(1337)
 
@@ -29,7 +32,6 @@ class SelectionTree(object):
         self._weight_matrix_3 = np.random.random((3, 1)) - 1
 
     def test(self, data):
-        # TODO: переделать проверку
         data = np.array(data)
         Z_12 = np.dot(data, self._weight_matrix_1)
         A_2 = sigmoid(Z_12)
@@ -39,9 +41,6 @@ class SelectionTree(object):
 
         Z_34 = np.dot(A_3, self._weight_matrix_3)
         return sigmoid(Z_34)
-
-    def _calculate(self, data):
-        return sigmoid(sigmoid(data.dot(self._weight_matrix_1)).dot(self._weight_matrix_2).dot(self._weight_matrix_3))
 
     def _step(self, input_train, output_train):
         Z_12 = np.dot(input_train, self._weight_matrix_1)
