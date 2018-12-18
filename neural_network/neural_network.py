@@ -31,8 +31,15 @@ class SelectionTree(object):
 
     def test(self, data):
         # TODO: переделать проверку
-        data = np.matrix(data)
-        return [self._calculate(d) for d in data]
+        data = np.array(data)
+        Z_12 = np.dot(data, self._weight_matrix_1)
+        A_2 = sigmoid(Z_12)
+
+        Z_23 = np.dot(A_2, self._weight_matrix_2)
+        A_3 = sigmoid(Z_23)
+
+        Z_34 = np.dot(A_3, self._weight_matrix_3)
+        return sigmoid(Z_34)
 
     def _calculate(self, data):
         return sigmoid(sigmoid(data.dot(self._weight_matrix_1)).dot(self._weight_matrix_2).dot(self._weight_matrix_3))

@@ -1,5 +1,4 @@
 from database import db
-from . import sigmoid
 
 
 class Tutorials:
