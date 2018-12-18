@@ -30,7 +30,6 @@ class SelectionTree(object):
         self._weight_matrix_3 = np.random.random((3, 1)) - 1
 
     def test(self, data):
-        # TODO: переделать проверку
         data = np.array(data)
         Z_12 = np.dot(data, self._weight_matrix_1)
         A_2 = sigmoid(Z_12)
@@ -68,9 +67,9 @@ class SelectionTree(object):
         self._weight_matrix_3 += np.dot(A_3.T, D_43)
 
     def _train(self):
-        for j in range(1000):
+        for j in range(10000):
             try:
-                data = Tutorials.get_samples()
+                data = Tutorials.get_samples(id_max=300)
             except ValueError:
                 continue
 
@@ -89,4 +88,5 @@ class SelectionTree(object):
             # print('WM_1 (9,5)')
             # print(self._weight_matrix_1)
             # print('\n')
-            print(f'TRAINING {j} COMPLETED! OMG!')
+            if j%100 == 0:
+                print(f'TRAINING {j} COMPLETED! OMG!')
