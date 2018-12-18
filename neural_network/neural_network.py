@@ -61,11 +61,24 @@ class SelectionTree(object):
 
     def _train(self):
         for i in range(1, self.N):
-            data = Tutorials.get_sample(i)
+            try:
+                data = Tutorials.get_sample(i)
+            except ValueError:
+                continue
             input_train = np.array([data["inputs"]])
-            print(input_train)
             output_train = np.array([data["answer"]]).T
             self._dostep(input_train, output_train)
+
+            # print('step: '+str(i))
+            # print('WM_3 (3,1)')
+            # print(self._weight_matrix_3)
+            #
+            # print('WM_2 (5,3)')
+            # print(self._weight_matrix_2)
+            #
+            # print('WM_1 (9,5)')
+            # print(self._weight_matrix_1)
+            # print('\n')
 
 
 BRW = SelectionTree(1)
