@@ -60,11 +60,13 @@ class SelectionTree(object):
         self._weight_matrix_3 += np.dot(A_3.T, D_43)
 
     def train(self, training_data):
-        for (input_train, output_train) in training_data:
+        for d in training_data:
+            input_train = np.array(d[0:-1])
+            output_train = np.array(d[-1])
             self._dostep(input_train, output_train)
 
 
 BRW = SelectionTree()
 
-training_data = ([1, 2, 3, 4, 5, 6, 7, 8, 9], [1])
+training_data = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 1]]
 BRW.train(training_data=training_data)
