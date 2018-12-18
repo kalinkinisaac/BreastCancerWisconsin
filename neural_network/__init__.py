@@ -1,7 +1,10 @@
 from database import db
-
+import numpy as np
 # TODO: move this code to another place
 # This is just example of db usage
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
 
 fields = dict({
     "identifier" : "INTEGER",

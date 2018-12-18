@@ -1,5 +1,5 @@
 from database import db
-
+from . import sigmoid
 class Tutorials:
     @staticmethod
     def get_sample(sample_id):
@@ -7,4 +7,4 @@ class Tutorials:
         if '?' in query:
             raise ValueError('idi nahuy')
 
-        return {"inputs" : query[:-1], "answer" : [query[-1]]}
+        return {"inputs" : list(map(lambda x: x/10, query[:-1])), "answer" : [query[-1]/4]}
