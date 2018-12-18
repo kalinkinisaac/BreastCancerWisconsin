@@ -39,5 +39,7 @@ class Database(object):
         return self.curs.fetchall()
 
     def get_rows(self, id_min, id_max):
-        self.curs.execute("SELECT * FROM {} WHERE id>=? AND id <?".format(self.name), (id_min, id_max,))
+        self.curs.execute(
+            "SELECT {} FROM {} WHERE id>=? AND id <?".format(', '.join(list(self._fields.keys())[1:]), self.name),
+            (id_min, id_max,))
         return self.curs.fetchall()
