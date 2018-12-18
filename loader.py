@@ -5,4 +5,4 @@ FIELDS = ["identifier", "clump_thickness", "cell_size_uniformity", "cell_shape_u
 
 if __name__ == "__main__":
     db.create(FIELDS)
-    db.load_data('../data.txt')
+    db.load_data('data.txt')

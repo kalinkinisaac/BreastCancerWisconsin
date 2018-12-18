@@ -23,13 +23,13 @@ class Database(object):
             self._columns = self.get_columns()
 
     def create(self, fields):
-        self._columns = fields
-
         self.curs.execute(DROP_TABLE_STR.format(self.name))
 
-        columns_str = ', '.join([f"{field} TEXT" for field in self._columns])
+        columns_str = ', '.join([f"{field} TEXT" for field in fields])
 
         self.curs.execute(CREATE_TABLE_STR.format(self.name, columns_str))
+
+        self._columns = self.get_columns()
 
     def get_columns(self):
         self.curs.execute("PRAGMA table_info({});".format(self.name))
