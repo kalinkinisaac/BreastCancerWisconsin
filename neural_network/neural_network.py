@@ -1,27 +1,26 @@
 import numpy as np
 from .training_data import Tutorials
 
-
-# Функция активации -- сигмоида (самая популярная)
+# Sigmoid function
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
-
-# Производная сигмоиды, понадобиться для высчитываения ошибки
-def dsigmoid(x):
+# Derivative of sigmoid function
+def der_sigmoid(x):
     return x * (1 - x)
 
-
-np.random.seed(1337)  # Делаем рандом менее рандомным :(
+np.random.seed(1337)
 
 
 class SelectionTree(object):
-    def __init__(self, N=1000):
+    def __init__(self, iterations=1000):
+        self.iterations = iterations
+
         self._weight_matrix_1 = None
         self._weight_matrix_2 = None
         self._weight_matrix_3 = None
+
         self._weight_matrix_init()
-        self.N = N
         self._train()
 
     def _weight_matrix_init(self):
@@ -30,6 +29,7 @@ class SelectionTree(object):
         self._weight_matrix_3 = np.random.random((3, 1)) - 1
 
     def test(self, data):
+        # TODO: переделать проверку
         data = np.array(data)
         Z_12 = np.dot(data, self._weight_matrix_1)
         A_2 = sigmoid(Z_12)
@@ -43,7 +43,7 @@ class SelectionTree(object):
     def _calculate(self, data):
         return sigmoid(sigmoid(data.dot(self._weight_matrix_1)).dot(self._weight_matrix_2).dot(self._weight_matrix_3))
 
-    def _dostep(self, input_train, output_train):
+    def _step(self, input_train, output_train):
         Z_12 = np.dot(input_train, self._weight_matrix_1)
         A_2 = sigmoid(Z_12)
 
@@ -54,39 +54,28 @@ class SelectionTree(object):
         A_4 = sigmoid(Z_34)
 
         Err_4 = output_train - A_4
-        D_43 = Err_4 * dsigmoid(A_4)
+        D_43 = Err_4 * der_sigmoid(A_4)
 
         Err_3 = np.dot(D_43, self._weight_matrix_3.T)
-        D_32 = Err_3 * dsigmoid(A_3)
+        D_32 = Err_3 * der_sigmoid(A_3)
 
         Err_2 = np.dot(D_32, self._weight_matrix_2.T)
-        D_21 = Err_2 * dsigmoid(A_2)
+        D_21 = Err_2 * der_sigmoid(A_2)
 
         self._weight_matrix_1 += np.dot(input_train.T, D_21)
         self._weight_matrix_2 += np.dot(A_2.T, D_32)
         self._weight_matrix_3 += np.dot(A_3.T, D_43)
 
     def _train(self):
-        for j in range(10000):
+        for j in range(self.iterations):
             try:
-                data = Tutorials.get_samples(id_max=300)
+                data = Tutorials.get_samples()
             except ValueError:
                 continue
 
             input_train = np.array(data[0])
             output_train = np.array([data[1]]).T
 
-            self._dostep(input_train, output_train)
+            self._step(input_train, output_train)
 
-            # print('step: '+str(i))
-            # print('WM_3 (3,1)')
-            # print(self._weight_matrix_3)
-            #
-            # print('WM_2 (5,3)')
-            # print(self._weight_matrix_2)
-            #
-            # print('WM_1 (9,5)')
-            # print(self._weight_matrix_1)
-            # print('\n')
-            if j%100 == 0:
-                print(f'TRAINING {j} COMPLETED! OMG!')
+            # print(f'Training iteration {j} is completed')
