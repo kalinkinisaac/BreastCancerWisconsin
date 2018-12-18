@@ -1,7 +1,5 @@
 import numpy as np
-
-
-# from database import db
+from .training_data import Tutorials
 
 # Функция активации -- сигмоида (самая популярная)
 def sigmoid(x):
@@ -17,11 +15,13 @@ np.random.seed(1337)  # Делаем рандом менее рандомным 
 
 
 class SelectionTree(object):
-    def __init__(self):
+    def __init__(self, N):
         self._weight_matrix_1 = None
         self._weight_matrix_2 = None
         self._weight_matrix_3 = None
         self._weight_matrix_init()
+        self.N = N
+        self._train()
 
     def _weight_matrix_init(self):
         self._weight_matrix_1 = np.random.random((9, 5)) - 1
@@ -59,14 +59,13 @@ class SelectionTree(object):
         self._weight_matrix_2 += np.dot(A_2.T, D_32)
         self._weight_matrix_3 += np.dot(A_3.T, D_43)
 
-    def train(self, training_data):
-        for d in training_data:
-            input_train = np.array(d[0:-1])
-            output_train = np.array(d[-1])
+    def _train(self):
+        for i in range(1, self.N):
+            data = Tutorials.get_sample(i)
+            input_train = np.array([data["inputs"]])
+            print(input_train)
+            output_train = np.array([data["answer"]]).T
             self._dostep(input_train, output_train)
 
 
-BRW = SelectionTree()
-
-training_data = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 1]]
-BRW.train(training_data=training_data)
+BRW = SelectionTree(1)
